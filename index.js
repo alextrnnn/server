@@ -19,10 +19,12 @@ import morgan from "morgan"
 import path from "path"
 import { fileURLToPath } from "url"
 
+import { register } from "./controllers/auth.js";
+
 /* CONFIGURATIONS */
 // Middleware - Functions that run between requests
 
-const filename = fileURLToPath(import.meta.url)
+const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 dotenv.config()
@@ -47,3 +49,17 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage })
+
+/* ROUTES WITH FILES" */
+//upload.single is a middleware function ran before register (controller: logic of endpoint)
+app.post("/auth/register", upload.single("picture"), register);
+
+/* MONGOOSE SETUP */
+const PORT = process.env.PORT || 6001;
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology:true,
+}).then(() => {
+    app.listen(PORT, () => console.log(`Server Port: ${PORT}`))
+}).catch((error) => console.log(`${error} did not connect`))
+
