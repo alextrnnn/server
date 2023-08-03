@@ -18,8 +18,12 @@ import morgan from "morgan"
 //utilties for working with file and directory paths
 import path from "path"
 import { fileURLToPath } from "url"
-import authRoutes from "./routes/auth.js";
-import { register } from "./controllers/auth.js";
+import authRoutes from "./routes/auth.js"
+import userRoutes from "./routes/users.js"
+import postRoutes from "./routes/posts.js"
+import { createPost } from "./controllers/posts.js"
+import { register } from "./controllers/auth.js"
+import { verifyToken } from "./middleware/auth.js"
 
 /* CONFIGURATIONS */
 // Middleware - Functions that run between requests
@@ -53,10 +57,12 @@ const upload = multer({ storage })
 /* ROUTES WITH FILES" */
 //upload.single is a middleware function ran before register (controller: logic of endpoint)
 //Reason why we do this here instead of within auth.js, is because we need upload
-app.post("/auth/register", upload.single("picture"), register);
-
+app.post("/auth/register", upload.single("picture"), register)
+app.post(".posts", verifyToken, upload.single("picture"), createPost)
 /* ROUTES */
-app.use("/auth", authRoutes);
+app.use("/auth", authRoutes)
+app.use("/users", userRoutes)
+app.use("/posts", postRoutes)
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
